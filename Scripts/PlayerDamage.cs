@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerDamage : MonoBehaviour
 {
     private bool immortal = false;
+    public Text myText;
     public int hp = 3;
-    public PlayerDamage()
+    private void Start()
     {
-
+        myText.text = "HP: " + hp.ToString();
     }
     public void GetDamage()
     {
@@ -20,6 +22,7 @@ public class PlayerDamage : MonoBehaviour
             hp--;
             if (hp <= 0)
                 SceneManager.LoadScene(1);
+            myText.text = "HP: " + hp;
             StartCoroutine(Immortal());
         }
 
