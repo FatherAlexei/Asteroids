@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,14 +11,19 @@ public class PlayerController : MonoBehaviour
     public float rotationSpeed = 3f;
     public float bulletSpeed = 100f;
     public GameObject bullet;
-    private ObjectPool objectPool;
+    public Sprite bulletSprite;
+    private Weapon weapon;
+    private WeaponProxy weaponProxy;
+    private Text text;
+
 
 
     // Start is called before the first frame update
     void Awake()
     {
-        objectPool = new ObjectPool(bullet);
         rb = GetComponent<Rigidbody2D>();
+        weapon = new Weapon(bullet, gunPos, bulletSpeed);
+        weaponProxy = new WeaponProxy(weapon, true, text);
     }
 
 
@@ -25,9 +31,9 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse0))
         {
-            Shoot();
+            weaponProxy.fire();
         }
-    }
+    } 
 
     // Update is called once per frame
     void FixedUpdate()
@@ -35,7 +41,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.W))
         {
-            rb.AddForce(gameObject.transform.up * speed);
+            rb.AddForce(gameObject.transform.up * speed); 
         }
 
         if (Input.GetKey(KeyCode.A))
@@ -55,18 +61,5 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void Shoot()
-    {
-        GameObject bufBullet = objectPool.Pop(gunPos);
-        Rigidbody2D bulletRb = bufBullet.GetComponent<Rigidbody2D>();
-        bulletRb.AddForce(gameObject.transform.up * bulletSpeed);
-        StartCoroutine(Pause(bufBullet));
-    }
-
-    IEnumerator Pause(GameObject bufBullet)
-    {
-        yield return new WaitForSeconds(3);
-        objectPool.Push(bufBullet);
-    }
 
 }

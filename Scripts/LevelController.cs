@@ -11,8 +11,7 @@ public class LevelController : MonoBehaviour
     public Transform center;
     void Start()
     {
-
-         StartCoroutine(CreateAsteroids());
+        StartCoroutine(CreateAsteroids());
     }
 
     IEnumerator CreateAsteroids()
@@ -20,7 +19,6 @@ public class LevelController : MonoBehaviour
         for (int i = 0; i < lvl * 2; i++)
         {
             GameObject bufAsteroid = Instantiate(asteroid, spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity);
-            bufAsteroid.name = "asteroid";
             Rigidbody2D asteroidRb = bufAsteroid.GetComponent<Rigidbody2D>();
             Vector2 dir = center.transform.position - transform.position;
             dir = dir.normalized;
