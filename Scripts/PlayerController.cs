@@ -1,23 +1,39 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
     public Transform gunPos;
     private Rigidbody2D rb;
+    public float damage = 1f;
     public float speed = 1f;
     public float rotationSpeed = 3f;
     public float bulletSpeed = 100f;
     public GameObject bullet;
-    private ObjectPool objectPool;
+    public Sprite bulletSprite;
+    private Weapon weapon;
+    private WeaponProxy weaponProxy;
+    private Text text;
+    public Text textUI;
+    private State state;
 
+    public State State
+    {
+        set
+        {
+            state = value;
+            state.Handle(this);
+        }
+    }
 
-    // Start is called before the first frame update
     void Awake()
     {
-        objectPool = new ObjectPool(bullet);
+        State = new MovingForwardState();
         rb = GetComponent<Rigidbody2D>();
+        weapon = new Weapon(bullet, gunPos, bulletSpeed);
+        weaponProxy = new WeaponProxy(weapon, true, text);
     }
 
 
@@ -25,48 +41,38 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse0))
         {
-            Shoot();
+            weaponProxy.fire();
         }
-    }
+    } 
 
-    // Update is called once per frame
     void FixedUpdate()
     {
 
         if (Input.GetKey(KeyCode.W))
         {
-            rb.AddForce(gameObject.transform.up * speed);
+            //rb.AddForce(gameObject.transform.up * speed);
+            State = new MovingForwardState();
         }
 
         if (Input.GetKey(KeyCode.A))
         {
-            rb.AddTorque(1 * rotationSpeed);
+            //rb.AddTorque(1 * rotationSpeed);
+            State = new RotationLeftState();
         }
 
         if (Input.GetKey(KeyCode.D))
         {
-            rb.AddTorque(-1 * rotationSpeed);
+            //rb.AddTorque(-1 * rotationSpeed);
+            State = new RotationRightState();
         }
 
         if (Input.GetKey(KeyCode.S))
         {
-            rb.AddForce(gameObject.transform.up * (speed * -1));
+            //rb.AddForce(gameObject.transform.up * (speed * -1));
+            State = new MovingBackState();
         }
 
     }
 
-    private void Shoot()
-    {
-        GameObject bufBullet = objectPool.Pop(gunPos);
-        Rigidbody2D bulletRb = bufBullet.GetComponent<Rigidbody2D>();
-        bulletRb.AddForce(gameObject.transform.up * bulletSpeed);
-        StartCoroutine(Pause(bufBullet));
-    }
-
-    IEnumerator Pause(GameObject bufBullet)
-    {
-        yield return new WaitForSeconds(3);
-        objectPool.Push(bufBullet);
-    }
 
 }
